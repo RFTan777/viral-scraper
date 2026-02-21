@@ -19,22 +19,30 @@ class VideoAnalyzer:
     """Analise tecnica de video: cortes, ritmo, frames."""
 
     def __init__(self):
-        self.ffmpeg = str(FFMPEG_DIR / "ffmpeg.exe")
+        self.ffmpeg = self._find_binary("ffmpeg")
         self.ffprobe = self._find_ffprobe()
+
+    @staticmethod
+    def _find_binary(name: str) -> str:
+        """Localiza binario: projeto (.exe) -> PATH do sistema -> nome puro."""
+        project_bin = FFMPEG_DIR / f"{name}.exe"
+        if project_bin.exists():
+            return str(project_bin)
+        found = shutil.which(name)
+        if found:
+            return found
+        return name
 
     def _find_ffprobe(self) -> str | None:
         """Tenta localizar ffprobe: projeto -> PATH -> None (fallback para ffmpeg)."""
-        # 1. Tentar no diretorio do projeto
         project_ffprobe = FFMPEG_DIR / "ffprobe.exe"
         if project_ffprobe.exists():
             return str(project_ffprobe)
 
-        # 2. Tentar no PATH do sistema
         ffprobe_in_path = shutil.which("ffprobe")
         if ffprobe_in_path:
             return ffprobe_in_path
 
-        # 3. Nao encontrado — usar fallback via ffmpeg
         print("  [VideoAnalyzer] ffprobe nao encontrado, usando fallback via ffmpeg")
         return None
 

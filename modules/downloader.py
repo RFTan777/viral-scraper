@@ -19,7 +19,19 @@ class VideoDownloader:
     """Baixa videos do TikTok e Instagram para analise."""
 
     def __init__(self):
-        self.ffmpeg_path = str(FFMPEG_DIR / "ffmpeg.exe")
+        self.ffmpeg_path = self._find_ffmpeg()
+
+    @staticmethod
+    def _find_ffmpeg() -> str:
+        """Localiza ffmpeg: projeto (.exe) -> PATH do sistema -> 'ffmpeg'."""
+        import shutil
+        project = FFMPEG_DIR / "ffmpeg.exe"
+        if project.exists():
+            return str(project)
+        found = shutil.which("ffmpeg")
+        if found:
+            return found
+        return "ffmpeg"
 
     def download_all(self, videos: list[dict], max_workers: int = 5) -> list[dict]:
         """
