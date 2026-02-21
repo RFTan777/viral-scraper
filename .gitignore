@@ -1,0 +1,35 @@
+# Dados sensíveis
+.env
+
+# Dados gerados pelo pipeline
+data/
+output/
+logs/
+exports/
+
+# Binários FFmpeg
+*.exe
+ffmpeg
+ffprobe
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.cursor/
+
+# Docker
+evolution_data/
+evolution_instances/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,14 @@
+# =======================================
+# VIRAL SCRAPER -- Dependencias (VERSAO GRATUITA)
+# =======================================
+
+# APIs GRATUITAS
+groq>=0.11.0                # Whisper gratis (transcricao)
+google-generativeai>=0.8.0  # Gemini gratis (analise + roteiros)
+requests>=2.31.0            # HTTP requests (Apify + downloads)
+
+# Video
+yt-dlp>=2024.1.0            # Download de videos (fallback)
+
+# Config
+python-dotenv>=1.0.0        # Carregar .env com chaves de API
