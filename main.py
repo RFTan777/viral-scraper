@@ -22,7 +22,7 @@ from pathlib import Path
 # Adicionar diretorio raiz ao path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from config import DATA_DIR, OUTPUT_DIR
+from config import DATA_DIR, OUTPUT_DIR, FAL_AI_KEY, VIDEO_AI
 from modules import (
     ApifyScraper,
     VideoDownloader,
@@ -34,6 +34,8 @@ from modules import (
     DeduplicationTracker,
     PipelineCheckpoint,
     RateTracker,
+    VideoAISender,
+    KlingLauncher,
 )
 
 
@@ -222,6 +224,84 @@ def run_script_generation(videos: list[dict], script_params: dict, niche: str) -
     return scripts
 
 
+def run_video_ai(scripts: list[dict]) -> None:
+    """Etapa 7: Gerar videos com IA — Kling.ai (gratis) ou fal.ai (pago)."""
+    print("\n" + "=" * 60)
+    print("  GERACAO DE VIDEO COM IA")
+    print("=" * 60)
+    print("\n  Opcoes:")
+    print("  1. Kling.ai — GRATUITO (66 clips/dia, sem API)")
+    print("     Browser abre automatico, prompt copiado para Ctrl+V")
+    print()
+    print("  2. fal.ai — PAGO (melhor qualidade, totalmente automatico)")
+    print("     Kling 1.6 ~$0.28/clip | Wan2.1 ~$0.05/clip")
+    print()
+    print("  0. Pular (prompts salvos em ai_video_prompts.md)")
+
+    escolha = input("\n  Escolha [1/2/0]: ").strip() or "1"
+
+    if escolha == "0":
+        print(f"\n  Prompts salvos em: {OUTPUT_DIR / 'ai_video_prompts.md'}")
+        print(f"  Prompts Kling em:  {OUTPUT_DIR / 'prompts_kling.txt'}")
+        return
+
+    if escolha == "1":
+        launcher = KlingLauncher()
+        launcher.launch(scripts)
+        return
+
+    if escolha == "2":
+        _run_fal_ai(scripts)
+
+
+def _run_fal_ai(scripts: list[dict]) -> None:
+    """Envia roteiros para fal.ai (pago)."""
+    if not FAL_AI_KEY:
+        print("\n  FAL_AI_KEY nao configurada no .env")
+        print("  Crie conta em https://fal.ai e adicione:")
+        print("  FAL_AI_KEY=sua_chave_aqui")
+        return
+
+    print("\n" + "=" * 60)
+    print("  fal.ai — GERACAO AUTOMATICA")
+    print("=" * 60)
+
+    VideoAISender.listar_modelos()
+
+    modelo_padrao = VIDEO_AI.get("modelo_padrao", "kling")
+    modelo_input = input(f"\n  Qual modelo? (Enter = {modelo_padrao}): ").strip() or modelo_padrao
+
+    max_cenas = VIDEO_AI.get("max_cenas_por_roteiro", 5)
+    max_input = input(f"  Cenas por roteiro? (Enter = {max_cenas}): ").strip()
+    if max_input.isdigit():
+        max_cenas = int(max_input)
+
+    gerar_global = input("  Gerar prompt global tambem? [s/N]: ").strip().lower() == "s"
+
+    try:
+        sender = VideoAISender(fal_api_key=FAL_AI_KEY, model=modelo_input)
+    except ValueError as e:
+        print(f"  ERRO: {e}")
+        return
+
+    for i, script in enumerate(scripts, 1):
+        titulo = script.get("titulo", f"Roteiro #{i}")
+        print(f"\n  [{i}/{len(scripts)}] {titulo}")
+
+        script_limitado = dict(script)
+        cenas = script.get("cenas", [])
+        if len(cenas) > max_cenas:
+            print(f"    Limitando: {max_cenas}/{len(cenas)} cenas")
+            script_limitado["cenas"] = cenas[:max_cenas]
+
+        sender.send_script(script_limitado)
+
+        if gerar_global:
+            sender.send_global_prompt(script)
+
+    print(f"\n  Videos em: {OUTPUT_DIR / 'video_gerado'}")
+
+
 # ---------------------------------------------
 # PIPELINE COMPLETO COM CHECKPOINT
 # ---------------------------------------------
@@ -331,6 +411,7 @@ def run_full_pipeline():
         checkpoint.save_stage("content_analysis", videos, extra_data)
 
     # 7. Perguntar se quer gerar roteiros
+    scripts = []
     print("\n" + "=" * 60)
     generate = input("\nDeseja gerar roteiros baseados na analise? [S/n]: ").strip().lower()
     if generate != "n":
@@ -345,6 +426,16 @@ def run_full_pipeline():
             scripts = run_script_generation(videos, script_params, niche)
             rate_tracker.track("gemini", num_scripts + 1)
             checkpoint.save_stage("script_generation", videos, extra_data)
+
+        # 7.5 Perguntar se quer enviar para IA de video
+        if scripts:
+            print("\n" + "=" * 60)
+            print("  ROTEIROS PRONTOS!")
+            print(f"  Prompts cinematograficos salvos em: {OUTPUT_DIR / 'ai_video_prompts.md'}")
+            print("=" * 60)
+            enviar_ia = input("\nDeseja enviar para IA de criacao de video (fal.ai)? [s/N]: ").strip().lower()
+            if enviar_ia == "s":
+                run_video_ai(scripts)
 
     # 8. Marcar videos como processados
     dedup.mark_batch(videos)
@@ -390,8 +481,9 @@ def interactive_menu():
         print("  2. Apenas Scraping")
         print("  3. Apenas Analise (precisa ter dados)")
         print("  4. Apenas Gerar Roteiros (precisa ter analise)")
-        print("  5. Ver ultimo relatorio")
-        print("  6. Status de rate limits")
+        print("  5. Gerar videos com IA (fal.ai) — roteiros existentes")
+        print("  6. Ver ultimo relatorio")
+        print("  7. Status de rate limits")
         print("  0. Sair")
 
         choice = input("\nEscolha: ").strip()
@@ -439,14 +531,30 @@ def interactive_menu():
             script_params = get_script_params()
             scripts = run_script_generation(videos, script_params, niche)
 
+            print(f"\n  Prompts de IA de video salvos em: {OUTPUT_DIR / 'ai_video_prompts.md'}")
+            enviar_ia = input("\nDeseja enviar para IA de criacao de video (fal.ai)? [s/N]: ").strip().lower()
+            if enviar_ia == "s":
+                run_video_ai(scripts)
+
         elif choice == "5":
+            # Carregar roteiros existentes e enviar para IA de video
+            roteiros_path = OUTPUT_DIR / "roteiros.json"
+            if not roteiros_path.exists():
+                print("Nenhum roteiro encontrado. Execute a geracao de roteiros primeiro.")
+                continue
+            with open(roteiros_path, encoding="utf-8") as f:
+                scripts = json.load(f)
+            print(f"\n  {len(scripts)} roteiro(s) encontrado(s)")
+            run_video_ai(scripts)
+
+        elif choice == "6":
             report_path = OUTPUT_DIR / "relatorio_viral.md"
             if report_path.exists():
                 print(report_path.read_text(encoding="utf-8"))
             else:
                 print("Nenhum relatorio encontrado.")
 
-        elif choice == "6":
+        elif choice == "7":
             rate_tracker = RateTracker()
             rate_tracker.print_status()
 

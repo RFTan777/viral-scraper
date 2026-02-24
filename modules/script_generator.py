@@ -353,7 +353,7 @@ Tema: {topic} | Nicho: {self.niche} | Duracao: {duration}s | ~{estimated_words} 
 
 ---
 
-INSTRUCAO: Gere um roteiro detalhado para o nicho "{self.niche}", tema "{topic}".
+INSTRUCAO: Gere um roteiro CINEMATOGRAFICO PROFISSIONAL para o nicho "{self.niche}", tema "{topic}".
 
 REQUISITOS OBRIGATORIOS:
 1. GANCHO nos primeiros 2-3 segundos — capturar atencao do publico do nicho {self.niche}.
@@ -361,6 +361,8 @@ REQUISITOS OBRIGATORIOS:
 3. B-ROLLS em CADA cena — visuais relevantes ao nicho {self.niche}.
 4. CONTEUDO que entrega VALOR REAL ao publico deste nicho.
 5. CTA final direcionando para a acao desejada.
+6. ai_video_prompt em CADA cena: prompt cinematografico detalhado em INGLES para ferramentas de IA de video (Kling, Runway, Wan2.1, Pika). Deve incluir: tipo de plano, angulo de camera, descricao fisica do apresentador, expressao facial exata, o que segura nas maos, descricao detalhada do ambiente ao redor, iluminacao, elementos de fundo, movimento de camera, estilo cinematografico, atmosfera.
+7. ai_production_prompt global: guia de estilo visual completo para o video inteiro.
 
 Retorne APENAS JSON valido (sem markdown code blocks, sem ```):
 
@@ -414,119 +416,178 @@ Retorne APENAS JSON valido (sem markdown code blocks, sem ```):
             "fala": {{
                 "texto": "texto EXATO a ser falado",
                 "entonacao": {{
-                    "tom": "tom desta cena",
+                    "tom": "tom desta cena: urgente | confidente | empolgado | intimo | autoritario | inspirador",
                     "volume": "1-10",
-                    "velocidade": "descricao",
-                    "pausas": "onde e quanto pausar",
-                    "enfase": ["palavras + COMO enfatizar"],
-                    "emocao_na_voz": "emocao predominante"
+                    "velocidade": "palavras por minuto e ritmo: ex: 180wpm acelerado, pausas curtas",
+                    "pausas": "onde pausar e por quanto tempo: ex: pausa de 0.5s apos palavra X",
+                    "enfase": ["PALAVRA em maiusculo = enfase forte", "palavra* = enfase media"],
+                    "emocao_na_voz": "emocao predominante: urgencia | empolgacao | empatia | autoridade | misterio",
+                    "respiracao": "onde respirar naturalmente, efeito na fala",
+                    "variacao_tonal": "como a voz sobe e desce ao longo da fala"
                 }}
             }},
             "brolls": [
                 {{
-                    "descricao": "descricao EXATA do B-roll",
-                    "tipo": "tipo do visual",
+                    "descricao": "descricao EXATA do B-roll — o que aparece na tela",
+                    "tipo": "screencast | ambiente | produto | grafico | before_after | mao_segurando",
                     "duracao": "X segundos",
-                    "momento_exato": "em qual segundo",
-                    "transicao_entrada": "tipo de transicao",
-                    "texto_overlay": "texto sobreposto (se houver)"
+                    "momento_exato": "em qual segundo do video",
+                    "transicao_entrada": "corte seco | fade | zoom | swipe",
+                    "texto_overlay": "texto sobreposto (se houver)",
+                    "detalhe_visual": "detalhe especifico: ex: tela do celular mostrando X, mao segurando produto Y"
                 }}
             ],
             "visual_apresentador": {{
-                "enquadramento": "close | meio | aberto",
-                "angulo_camera": "frontal | 45 graus | etc",
-                "movimento": "estatico | zoom in | pan",
-                "acao": "EXATAMENTE o que fazer",
-                "cenario": "fundo visivel"
+                "enquadramento": "close extremo (apenas rosto) | close (busto) | meio (cintura) | aberto (corpo inteiro)",
+                "angulo_camera": "frontal direto | 15 graus esquerda | 45 graus | levemente abaixo | levemente acima",
+                "movimento_camera": "estatica | zoom in lento | pan esquerda | handheld leve | steadicam",
+                "acao_corpo": "descricao EXATA do que o apresentador faz com o corpo",
+                "maos": "o que as maos fazem: segura celular mostrando tela | aponta para grafico | gesticula | repousa",
+                "objeto_em_maos": "se segura algo: descricao exata do objeto e como o mostra para camera",
+                "expressao_facial": "expressao EXATA: sobrancelha erguida de surpresa | olhar direto com intensidade | sorriso contido",
+                "olhar": "direto para camera | para objeto nas maos | para cima pensativo",
+                "postura": "inclinado para frente com urgencia | relaxado | ereto e confiante",
+                "cenario": {{
+                    "local": "tipo de local: escritorio home office | cafe | estudio | exterior",
+                    "fundo": "o que aparece ao fundo: parede clara | estante com livros | janela com luz natural",
+                    "elementos_visiveis": ["item 1 ao fundo", "item 2", "detalhe de ambiente"],
+                    "atmosfera": "sensacao do ambiente: profissional moderno | aconchegante | minimalista"
+                }}
+            }},
+            "iluminacao": {{
+                "tipo": "luz natural de janela | ring light | softbox lateral | luz de tela | ambiente escuro com destaque",
+                "direcao": "esquerda | direita | frontal | de cima | contraluz",
+                "intensidade": "1-10",
+                "temperatura": "quente (3000K) | neutra (4500K) | fria (6500K)",
+                "efeito": "o que a iluminacao transmite: autoridade | intimidade | urgencia | calor"
             }},
             "texto_tela": {{
-                "texto": "overlay de texto",
-                "estilo": "estilo visual",
-                "animacao": "tipo de animacao"
+                "texto": "overlay de texto exato",
+                "estilo": "bold branco com sombra | destaque amarelo | letra de impacto | caption gerada",
+                "posicao": "topo | centro | inferior | lateral",
+                "animacao": "aparece com pop | digita | slide da esquerda | fade in",
+                "timing": "aparece no segundo X, some no segundo Y"
             }},
             "edicao": {{
-                "tipo_corte": "tipo de corte/transicao",
-                "efeito": "efeito visual",
-                "sfx": "efeito sonoro",
-                "musica": "momento e intensidade da musica"
+                "tipo_corte": "corte seco | L-cut | J-cut | jump cut | match cut | fade",
+                "efeito_visual": "sem efeito | zoom brusco | slow motion | speed ramp | freeze frame",
+                "sfx": "sem SFX | whoosh | click | notification sound | impacto grave | swipe",
+                "musica": {{
+                    "genero": "lo-fi | trap instrumental | cinematic | pop energetico | ambiente",
+                    "volume": "porcentagem: ex 20% atras da voz",
+                    "momento": "entra no segundo X, aumenta no Y, some no Z",
+                    "mood": "tensao | empolgacao | esperanca | foco | urgencia"
+                }}
             }},
             "storytelling": {{
-                "tecnica_retencao": "tecnica ativa nesta cena",
-                "estado_mental_viewer": "o que o espectador esta PENSANDO",
-                "nivel_engajamento": "1-10"
+                "tecnica_retencao": "cliffhanger | loop aberto | pergunta sem resposta | revelacao parcial | contraste",
+                "estado_mental_viewer": "o que o espectador esta PENSANDO e SENTINDO neste momento",
+                "nivel_engajamento": "1-10",
+                "transicao_proxima_cena": "como esta cena puxa para a proxima — por que o viewer continua assistindo"
+            }},
+            "ai_video_prompt": {{
+                "prompt_en": "Ultra-detailed English prompt for AI video generation (Kling/Runway/Wan2.1/Pika). Include ALL of: [SHOT TYPE] specific shot name. [SUBJECT] physical description of presenter (approximate age, ethnicity, clothing color and style, facial expression, body language). [HANDS/OBJECTS] exactly what they hold, how they hold it, what it shows. [ENVIRONMENT] exact room type, specific background elements visible (furniture, decor, objects on walls/desk), depth, textures. [LIGHTING] exact light setup, direction, quality, color temperature. [CAMERA] movement type, lens feel, depth of field. [STYLE] cinematic reference or aesthetic. [MOOD] atmosphere and emotional tone. [FORMAT] 9:16 vertical smartphone format.",
+                "negative_prompt_en": "blurry, low quality, watermark, text overlay, distorted face, extra limbs, unrealistic",
+                "style_reference": "cinematic documentary | lifestyle vertical | raw TikTok | professional brand | editorial",
+                "clip_duration_seconds": 5,
+                "aspect_ratio": "9:16"
             }}
         }}
     ],
     "mapa_do_video": {{
         "00-20%_GANCHO": {{
-            "objetivo": "capturar atencao",
-            "emocao_alvo": "emocao desejada",
-            "estrategia": "como fazer"
+            "objetivo": "capturar atencao e criar curiosidade irresistivel",
+            "emocao_alvo": "emocao desejada no espectador",
+            "estrategia": "como exatamente executar"
         }},
         "20-35%_CREDIBILIDADE": {{
-            "objetivo": "provar autoridade",
+            "objetivo": "provar autoridade de forma rapida e incontestavel",
             "emocao_alvo": "emocao desejada",
-            "estrategia": "como fazer"
+            "estrategia": "como exatamente executar"
         }},
         "35-75%_CONTEUDO": {{
-            "objetivo": "entregar valor",
+            "objetivo": "entregar valor real e criar desejo pelo proximo passo",
             "emocao_alvo": "emocao desejada",
-            "estrategia": "como fazer"
+            "estrategia": "como exatamente executar"
         }},
         "75-100%_CTA": {{
-            "objetivo": "converter em acao",
+            "objetivo": "converter em acao com urgencia e clareza",
             "emocao_alvo": "emocao desejada",
-            "estrategia": "como fazer"
+            "estrategia": "como exatamente executar"
         }}
     }},
     "arsenal_brolls": {{
-        "gancho_visuais": ["descricao de cada B-roll de gancho"],
-        "credibilidade_visuais": ["descricao de cada visual de prova"],
-        "conteudo_visuais": ["descricao de cada visual de conteudo"],
-        "cta_visuais": ["descricao de cada visual de CTA"]
+        "gancho_visuais": ["descricao cinematografica de cada B-roll de gancho"],
+        "credibilidade_visuais": ["descricao de cada visual de prova de autoridade"],
+        "conteudo_visuais": ["descricao de cada visual de entrega de valor"],
+        "cta_visuais": ["descricao de cada visual de chamada para acao"]
     }},
     "tecnicas_retencao_aplicadas": [
-        {{"tecnica": "...", "onde_aplicada": "cena X", "como_funciona": "..."}}
+        {{"tecnica": "nome da tecnica", "onde_aplicada": "cena X momento Y", "como_funciona": "mecanismo psicologico"}}
     ],
     "cta_final": {{
         "tipo": "tipo do CTA",
         "texto_fala": "texto EXATO do CTA",
-        "como_falar": "direcao vocal do CTA",
+        "como_falar": {{
+            "tom": "tom do CTA",
+            "velocidade": "ritmo da fala",
+            "enfase": "palavras de impacto",
+            "urgencia_vocal": "como criar urgencia na voz"
+        }},
         "oferta": "o que oferece como proximo passo",
-        "urgencia": "elemento de urgencia (se aplicavel)",
-        "conexao_com_gancho": "como conecta de volta ao inicio",
-        "broll_cta": "visual do CTA"
+        "urgencia": "elemento de urgencia concreto",
+        "conexao_com_gancho": "como fecha o loop aberto do gancho",
+        "broll_cta": "visual exato do CTA"
     }},
     "producao": {{
-        "cenario_ideal": "descricao detalhada do cenario",
-        "iluminacao": "tipo de iluminacao",
+        "cenario_ideal": "descricao detalhada do cenario de filmagem — local, disposicao, elementos",
+        "iluminacao_setup": "setup completo de iluminacao: posicao de cada luz, tipo, temperatura",
         "audio": {{
-            "musica_sugerida": "genero e mood",
-            "volume_musica": "porcentagem em relacao a voz",
-            "sfx_chave": ["lista de efeitos sonoros"]
+            "musica_sugerida": "genero, mood e BPM sugerido",
+            "volume_musica": "porcentagem relativa a voz por bloco",
+            "sfx_chave": ["SFX com momento exato de uso"]
         }},
-        "figurino": "descricao do figurino ideal",
-        "formato": "9:16 vertical"
+        "figurino": "descricao detalhada do figurino — cor, estilo, acessorios, por que transmite autoridade",
+        "formato": "9:16 vertical — resolucao minima 1080x1920",
+        "equipamento_minimo": "o minimo necessario para gravar com qualidade"
+    }},
+    "ai_production_prompt": {{
+        "style_guide_en": "Complete visual style guide for the entire video: color palette, aesthetic, tone, reference films/creators",
+        "color_grade_en": "Color grading description: warm/cool, saturation, contrast, LUT style",
+        "camera_style_en": "Camera style throughout: handheld organic feel | static authority | dynamic movement",
+        "subject_description_en": "Consistent main subject description for all scenes: physical appearance, clothing, presence",
+        "primary_environment_en": "Main filming location: specific room details, decor, layout",
+        "prompt_global_en": "COMPLETE unified prompt for generating the full video in one shot with AI tools. This is the master prompt combining all scenes into a cohesive 60-second vertical video narrative. Include all visual details, transitions, pacing, and style.",
+        "modelo_recomendado": "Kling 1.6 Pro | Wan2.1 14B | CogVideoX-5b — escolha baseada no estilo",
+        "razao_modelo": "por que este modelo e o melhor para este roteiro especifico",
+        "parametros_api": {{
+            "aspect_ratio": "9:16",
+            "duration": "5",
+            "cfg_scale": 0.5,
+            "negative_prompt": "blurry, low quality, watermark, text overlay, distorted face, amateur, shaky"
+        }}
     }},
     "distribuicao": {{
-        "titulo_tiktok": "descricao TikTok com gancho",
-        "titulo_instagram": "descricao Instagram",
+        "titulo_tiktok": "caption TikTok otimizada com gancho nos primeiros 125 caracteres",
+        "titulo_instagram": "caption Instagram com storytelling e chamada para salvar",
         "hashtags": {{
-            "alcance": ["3-5 hashtags de alcance"],
-            "nicho": ["3-5 hashtags do nicho {self.niche}"],
-            "long_tail": ["2-3 especificas"]
+            "alcance": ["3-5 hashtags de alcance massivo"],
+            "nicho": ["3-5 hashtags especificas do nicho {self.niche}"],
+            "long_tail": ["2-3 hashtags de nicho especifico com alta conversao"]
         }},
-        "horario_postagem": "melhor horario para o publico do nicho",
-        "dia_semana": "melhor dia"
+        "horario_postagem": "melhor horario com justificativa para o publico do nicho",
+        "dia_semana": "melhor dia com justificativa"
     }}
 }}
 
-REGRAS:
-- GANCHO forte e impossivel de ignorar. O espectador TEM que parar de scrollar.
-- TOM adaptado ao nicho {self.niche} o video inteiro.
-- B-ROLLS em TODA cena. Descricoes EXATAS e relevantes ao nicho.
+REGRAS CRITICAS:
+- GANCHO: impossivel de ignorar. O espectador TEM que parar de scrollar nos primeiros 2 segundos.
+- TOM adaptado ao nicho {self.niche} o video inteiro — nada generico.
+- B-ROLLS: em TODA cena, com descricoes CINEMATOGRAFICAS e EXATAS.
+- ENTONACAO: cada cena deve ter instrucoes vocais precisas como um diretor de cinema daria ao ator.
+- AI_VIDEO_PROMPT: cada cena OBRIGATORIAMENTE deve ter prompt em ingles cinematografico profissional, detalhando objetos nas maos, expressao facial, ambiente ao redor, iluminacao, movimento de camera.
 - Minimo 6-10 cenas seguindo GANCHO -> CREDIBILIDADE -> CONTEUDO -> CTA.
-- Especifico ao tema: "{topic}"
+- ESPECIFICO ao tema: "{topic}" — zero generalizacao.
 """
 
         response = self.model.generate_content(
@@ -539,23 +600,122 @@ REGRAS:
 
         response_text = self._extract_text(response)
 
-        try:
-            clean = response_text.strip()
-            if clean.startswith("```"):
-                clean = clean.split("\n", 1)[1] if "\n" in clean else clean[3:]
-            if clean.endswith("```"):
-                clean = clean[:-3]
-            clean = clean.strip()
-            json_start = clean.find("{")
-            json_end = clean.rfind("}") + 1
-            if json_start >= 0 and json_end > json_start:
-                script = json.loads(clean[json_start:json_end])
-            else:
-                script = {"raw_script": response_text}
-        except json.JSONDecodeError:
-            script = {"raw_script": response_text}
-
+        script = self._parse_json_response(response_text)
         return script
+
+    @staticmethod
+    def _parse_json_response(response_text: str) -> dict:
+        """Tenta parsear JSON da resposta, com fallback para repair."""
+        clean = response_text.strip()
+
+        # Remove markdown code fences
+        if clean.startswith("```"):
+            clean = clean.split("\n", 1)[1] if "\n" in clean else clean[3:]
+        if clean.endswith("```"):
+            clean = clean[:-3]
+        clean = clean.strip()
+
+        # Extrai o JSON entre { e }
+        json_start = clean.find("{")
+        if json_start < 0:
+            return {"raw_script": response_text}
+
+        # Tenta parse do JSON completo
+        json_end = clean.rfind("}") + 1
+        if json_end > json_start:
+            try:
+                return json.loads(clean[json_start:json_end])
+            except json.JSONDecodeError:
+                pass
+
+        # JSON truncado (token limit atingido) — tenta reparar fechando estruturas abertas
+        truncated = clean[json_start:]
+        repaired = ScriptGenerator._repair_truncated_json(truncated)
+        if repaired:
+            return repaired
+
+        return {"raw_script": response_text}
+
+    @staticmethod
+    def _repair_truncated_json(text: str) -> dict | None:
+        """Tenta recuperar um JSON truncado fechando colchetes/chaves abertas."""
+        # Conta abertura/fechamento de estruturas
+        depth_curly = 0
+        depth_square = 0
+        in_string = False
+        escape_next = False
+        last_valid_pos = 0
+
+        for i, ch in enumerate(text):
+            if escape_next:
+                escape_next = False
+                continue
+            if ch == "\\" and in_string:
+                escape_next = True
+                continue
+            if ch == '"' and not escape_next:
+                in_string = not in_string
+                continue
+            if in_string:
+                continue
+            if ch == "{":
+                depth_curly += 1
+            elif ch == "}":
+                depth_curly -= 1
+                if depth_curly == 0:
+                    last_valid_pos = i + 1
+            elif ch == "[":
+                depth_square += 1
+            elif ch == "]":
+                depth_square -= 1
+
+        # Fecha as estruturas abertas
+        closing = ""
+        # Remove trailing comma/incomplete field antes de fechar
+        trimmed = text.rstrip()
+        # Remove ultima linha incompleta se nao tiver fechamento
+        if trimmed and trimmed[-1] not in ('"', '}', ']', '0123456789'):
+            # Volta ate a ultima virgula ou chave valida
+            for i in range(len(trimmed) - 1, 0, -1):
+                if trimmed[i] in (',', '{', '['):
+                    trimmed = trimmed[:i]
+                    break
+
+        # Recontar apos trim
+        depth_curly = 0
+        depth_square = 0
+        in_string = False
+        escape_next = False
+        for ch in trimmed:
+            if escape_next:
+                escape_next = False
+                continue
+            if ch == "\\" and in_string:
+                escape_next = True
+                continue
+            if ch == '"':
+                in_string = not in_string
+                continue
+            if in_string:
+                continue
+            if ch == "{":
+                depth_curly += 1
+            elif ch == "}":
+                depth_curly -= 1
+            elif ch == "[":
+                depth_square += 1
+            elif ch == "]":
+                depth_square -= 1
+
+        closing = "]" * max(0, depth_square) + "}" * max(0, depth_curly)
+        candidate = trimmed + closing
+
+        try:
+            result = json.loads(candidate)
+            print("    AVISO: JSON truncado reparado automaticamente.")
+            return result
+        except json.JSONDecodeError:
+            return None
 
     # -----------------------------------------
     # SALVAR
@@ -566,6 +726,52 @@ REGRAS:
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(scripts, f, ensure_ascii=False, indent=2)
         print(f"\n  JSON: {json_path}")
+        self._save_ai_prompts(scripts, topic)
+
+    def _save_ai_prompts(self, scripts, topic):
+        """Salva arquivo dedicado com todos os prompts para IA de video."""
+        prompts_path = OUTPUT_DIR / "ai_video_prompts.md"
+        with open(prompts_path, "w", encoding="utf-8") as f:
+            f.write(f"# PROMPTS PARA IA DE VIDEO — {topic}\n")
+            f.write(f"*Nicho: {self.niche} | Pronto para: Kling AI, Wan2.1, Runway, Pika*\n\n---\n\n")
+
+            for i, script in enumerate(scripts, 1):
+                title = script.get("titulo", f"Roteiro #{i}")
+                f.write(f"## ROTEIRO #{i}: {title}\n\n")
+
+                prod_prompt = script.get("ai_production_prompt", {})
+                if prod_prompt:
+                    f.write("### PROMPT GLOBAL (video completo)\n\n")
+                    f.write(f"**Modelo recomendado:** {prod_prompt.get('modelo_recomendado', '')}\n")
+                    f.write(f"**Motivo:** {prod_prompt.get('razao_modelo', '')}\n\n")
+                    f.write("**PROMPT COMPLETO:**\n\n")
+                    f.write(f"```\n{prod_prompt.get('prompt_global_en', '')}\n```\n\n")
+                    f.write(f"**Negative prompt:** `{prod_prompt.get('parametros_api', {}).get('negative_prompt', '')}`\n\n")
+                    f.write(f"**Style Guide:** {prod_prompt.get('style_guide_en', '')}\n\n")
+                    f.write(f"**Color Grade:** {prod_prompt.get('color_grade_en', '')}\n\n")
+                    f.write("---\n\n")
+
+                cenas = script.get("cenas", [])
+                if cenas:
+                    f.write("### PROMPTS POR CENA\n\n")
+                    for cena in cenas:
+                        ai_prompt = cena.get("ai_video_prompt", {})
+                        if ai_prompt:
+                            f.write(f"#### [{cena.get('momento', '?')}] {cena.get('bloco', '')} — Cena {cena.get('numero', '?')}\n\n")
+                            f.write(f"**PROMPT:**\n\n```\n{ai_prompt.get('prompt_en', '')}\n```\n\n")
+                            f.write(f"**Negative:** `{ai_prompt.get('negative_prompt_en', '')}`\n\n")
+                            f.write(f"**Estilo:** {ai_prompt.get('style_reference', '')} | **Duracao:** {ai_prompt.get('clip_duration_seconds', 5)}s | **Ratio:** {ai_prompt.get('aspect_ratio', '9:16')}\n\n")
+
+                            fala = cena.get("fala", {})
+                            ent = fala.get("entonacao", {}) if isinstance(fala, dict) else {}
+                            if ent:
+                                f.write(f"**Entonacao:** Tom: {ent.get('tom', '')} | Emocao: {ent.get('emocao_na_voz', '')} | {ent.get('velocidade', '')}\n\n")
+                                if isinstance(fala, dict):
+                                    f.write(f"**Fala:** _{fala.get('texto', '')}_\n\n")
+
+                            f.write("---\n\n")
+
+        print(f"  Prompts IA: {prompts_path}")
 
     def _save_scripts_markdown(self, scripts, topic):
         md_path = OUTPUT_DIR / "roteiros.md"

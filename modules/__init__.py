@@ -12,6 +12,8 @@ from .content_filter import ContentFilter
 from .dedup import DeduplicationTracker
 from .checkpoint import PipelineCheckpoint
 from .rate_tracker import RateTracker
+from .video_ai_sender import VideoAISender
+from .kling_launcher import KlingLauncher
 
 __all__ = [
     "ApifyScraper",
@@ -24,4 +26,6 @@ __all__ = [
     "DeduplicationTracker",
     "PipelineCheckpoint",
     "RateTracker",
+    "VideoAISender",
+    "KlingLauncher",
 ]

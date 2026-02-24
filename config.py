@@ -22,7 +22,11 @@ APIFY_API_TOKEN = os.getenv("APIFY_API_TOKEN", "")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
-# Validar chaves
+# FAL_AI_KEY e opcional — necessaria apenas para gerar videos com IA
+# Crie sua chave gratuita em: https://fal.ai/dashboard/keys
+FAL_AI_KEY = os.getenv("FAL_AI_KEY", "")
+
+# Validar chaves obrigatorias
 _missing = []
 if not APIFY_API_TOKEN:
     _missing.append("APIFY_API_TOKEN")
@@ -104,8 +108,19 @@ VIDEO_ANALYSIS = {
 # ---------------------------------------------
 
 GEMINI = {
-    "model": "gemini-2.5-flash-preview-05-20",
-    "max_tokens": 8192,
+    "model": "gemini-2.5-flash",
+    "max_tokens": 65536,
     "temperature": 0.7,             # para roteiros (criativo)
     "temperature_analysis": 0.2,    # para analise (preciso)
+}
+
+# ---------------------------------------------
+# CONFIGURACOES DE IA DE VIDEO (fal.ai) — OPCIONAL
+# ---------------------------------------------
+
+VIDEO_AI = {
+    "modelo_padrao": "kling",       # kling | kling_pro | wan | wan_14b | cogvideo
+    "max_cenas_por_roteiro": 5,     # limita quantas cenas gerar para economizar creditos
+    "gerar_automatico": False,      # True = gera sem perguntar apos roteiro pronto
+    "baixar_clips": True,           # True = baixa os clips gerados localmente
 }
