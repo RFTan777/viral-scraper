@@ -13,6 +13,9 @@ yt-dlp>=2024.1.0            # Download de videos (fallback)
 # Config
 python-dotenv>=1.0.0        # Carregar .env com chaves de API
 
+# Voiceover TTS (gratis, sem API key)
+edge-tts>=7.0.0             # Vozes Microsoft pt-BR (FranciscaNeural, AntonioNeural)
+
 # IA de Video (opcional — necessario apenas para geracao automatica de video)
 # fal-client>=0.13.0        # SDK oficial fal.ai (alternativa ao requests direto)
 # Instalar com: pip install fal-client

@@ -14,6 +14,9 @@ from .checkpoint import PipelineCheckpoint
 from .rate_tracker import RateTracker
 from .video_ai_sender import VideoAISender
 from .kling_launcher import KlingLauncher
+from .tts_generator import TTSGenerator
+from .video_editor import VideoEditor
+from .pipeline_video import PipelineVideo
 
 __all__ = [
     "ApifyScraper",
@@ -28,4 +31,7 @@ __all__ = [
     "RateTracker",
     "VideoAISender",
     "KlingLauncher",
+    "TTSGenerator",
+    "VideoEditor",
+    "PipelineVideo",
 ]

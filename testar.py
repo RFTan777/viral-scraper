@@ -369,6 +369,12 @@ def menu():
 
   4. Ver prompts gerados
 
+  5. Gerar VIDEO COMPLETO — TTS + edicao (sem IA, gratis)
+     (usa roteiros existentes, gera MP4 pronto para postar)
+
+  6. Gerar VIDEO COMPLETO — TTS + clips fal.ai + edicao
+     (requer FAL_AI_KEY no .env)
+
   0. Sair
 """)
 
@@ -383,6 +389,10 @@ def menu():
             testar_roteiro_mock()
         elif choice == "4":
             ver_prompts()
+        elif choice == "5":
+            testar_video(modo="sem_ia")
+        elif choice == "6":
+            testar_video(modo="com_ia")
         elif choice == "0":
             print("\n  Ate mais!")
             break
@@ -394,12 +404,64 @@ def menu():
 # ENTRY POINT
 # -----------------------------------------------------------
 
+def testar_video(modo="sem_ia", music_path=None, voice=None, clips_dir=None):
+    """Gera video completo a partir de output/roteiros.json."""
+    roteiros_path = OUTPUT_DIR / "roteiros.json"
+    if not roteiros_path.exists():
+        print(f"\n  ERRO: {roteiros_path} nao encontrado.")
+        print("  Execute primeiro: python testar.py --roteiro")
+        return
+
+    with open(roteiros_path, encoding="utf-8") as f:
+        scripts = json.load(f)
+
+    # Filtrar apenas roteiros com cenas
+    scripts_validos = [s for s in scripts if s.get("cenas")]
+    if not scripts_validos:
+        print("\n  AVISO: Roteiros sem cenas encontrados.")
+        print("  Regenere os roteiros: python testar.py --roteiro")
+        return
+
+    print(f"\n  {len(scripts_validos)} roteiro(s) valido(s)")
+    for i, s in enumerate(scripts_validos, 1):
+        cenas = len(s.get("cenas", []))
+        print(f"  [{i}] {s.get('titulo','?')[:60]} — {cenas} cenas")
+
+    if len(scripts_validos) > 1:
+        idx = input("\n  Qual processar? (Enter=todos | 1,2,...): ").strip()
+        if idx.isdigit() and 1 <= int(idx) <= len(scripts_validos):
+            scripts_validos = [scripts_validos[int(idx) - 1]]
+
+    if not voice:
+        print("\n  Voz TTS:")
+        print("  1. Feminina — pt-BR-FranciscaNeural (recomendada para conteudo)")
+        print("  2. Masculina — pt-BR-AntonioNeural (autoridade/vendas)")
+        v = input("  Escolha [1/2] (Enter=1): ").strip() or "1"
+        voice = "masculino" if v == "2" else "feminino"
+
+    if not music_path:
+        music_path = input("\n  Path da musica de fundo (Enter=sem musica): ").strip() or None
+
+    from modules.pipeline_video import PipelineVideo
+    pipeline = PipelineVideo(voice=voice, music_path=music_path)
+    pipeline.executar(scripts_validos, modo=modo, clips_dir=clips_dir)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Viral Scraper — Teste")
-    parser.add_argument("--kling", action="store_true", help="Abre Kling com roteiros existentes")
-    parser.add_argument("--roteiro", action="store_true", help="Gera roteiro com dados existentes")
-    parser.add_argument("--mock", action="store_true", help="Gera roteiro com dados mock")
-    parser.add_argument("--prompts", action="store_true", help="Mostra prompts gerados")
+    parser.add_argument("--kling",    action="store_true", help="Abre Kling com roteiros existentes")
+    parser.add_argument("--roteiro",  action="store_true", help="Gera roteiro com dados existentes")
+    parser.add_argument("--mock",     action="store_true", help="Gera roteiro com dados mock")
+    parser.add_argument("--prompts",  action="store_true", help="Mostra prompts gerados")
+    parser.add_argument("--video",    action="store_true", help="Gera video completo (TTS + ffmpeg)")
+    parser.add_argument("--modo",     default="sem_ia",
+                        choices=["sem_ia", "com_ia", "clips_ok"],
+                        help="Modo video: sem_ia (default) | com_ia (fal.ai) | clips_ok")
+    parser.add_argument("--musica",   default="", help="Path MP3 para musica de fundo")
+    parser.add_argument("--voz",      default="",
+                        choices=["feminino", "masculino", "feminino2", "masculino2", ""],
+                        help="Voz TTS")
+    parser.add_argument("--clips-dir", default="", help="Pasta de clips para modo clips_ok")
     args = parser.parse_args()
 
     if args.kling:
@@ -410,5 +472,12 @@ if __name__ == "__main__":
         testar_roteiro_mock()
     elif args.prompts:
         ver_prompts()
+    elif args.video:
+        testar_video(
+            modo=args.modo,
+            music_path=args.musica or None,
+            voice=args.voz or None,
+            clips_dir=args.clips_dir or None,
+        )
     else:
         menu()
