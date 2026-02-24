@@ -129,6 +129,8 @@ class VideoEditor:
 
         # Adicionar musica (opcional)
         final_path = self.output_dir / f"{safe}_FINAL.mp4"
+        if final_path.exists():
+            final_path.unlink()
         if music_path and Path(music_path).exists():
             print(f"  Adicionando musica: {Path(music_path).name}")
             ok = self._add_music(concat_path, music_path, final_path)
